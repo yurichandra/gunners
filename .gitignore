@@ -1,2 +1,5 @@
 # exclude main build program
 gunners
+
+# exclude env file
+.env

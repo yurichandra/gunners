@@ -1,0 +1,25 @@
+app_root: .
+
+ignored_folders:
+  - vendor
+
+included_extensions:
+  - .go
+
+build_target_path: ""
+
+build_path: /tmp
+
+build_delay: 200ns
+
+build_flags: []
+
+command_env: []
+
+command_flags: ["serve"]
+
+binary_name: refresh-build
+
+enable_colors: true
+
+log_name: ""

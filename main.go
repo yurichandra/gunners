@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/yurichandra/gunners/cmd"
+)
 
 func main() {
 	fmt.Println("Welcome to gunners: A Livescore API")
+
+	cmd.Serve()
 }
