@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -16,11 +17,56 @@ type TwitterService struct {
 	http *http.Client
 }
 
+type twitterResponse struct {
+	ID    string `json:"id"`
+	Value string `json:"value"`
+}
+
+type twitterListResponse struct {
+	Data []twitterResponse `json:"data"`
+}
+
 // NewTwitterService :nodoc:
 func NewTwitterService(client *http.Client) *TwitterService {
 	return &TwitterService{
 		http: client,
 	}
+}
+
+// GetRules :nodoc:
+func (service *TwitterService) GetRules() ([]models.TwitterRules, error) {
+	url := fmt.Sprintf("%s/2/tweets/search/stream/rules", os.Getenv("TWITTER_API_BASE"))
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []models.TwitterRules{}, err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("TWITTER_BEARER_TOKEN")))
+
+	response, err := service.http.Do(req)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return []models.TwitterRules{}, err
+	}
+
+	var rules twitterListResponse
+
+	err = json.Unmarshal(body, &rules)
+	if err != nil {
+		return []models.TwitterRules{}, err
+	}
+
+	var twitterRulesList []models.TwitterRules
+	for _, item := range rules.Data {
+		twitterRules := models.TwitterRules{
+			Value: item.Value,
+		}
+
+		twitterRulesList = append(twitterRulesList, twitterRules)
+	}
+
+	return twitterRulesList, nil
 }
 
 // SetRules :nodoc:

@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/yurichandra/gunners/internal/handlers/requests"
+	"github.com/yurichandra/gunners/internal/handlers/responses"
 	"github.com/yurichandra/gunners/internal/models"
 	"github.com/yurichandra/gunners/internal/services"
 )
@@ -26,9 +27,26 @@ func NewRulesHandler(twitterService services.TwitterServiceContract) *RulesHandl
 func (handler *RulesHandler) GetRoutes() chi.Router {
 	router := chi.NewRouter()
 
+	router.Get("/", handler.GetRules)
 	router.Post("/", handler.StoreRules)
 
 	return router
+}
+
+// GetRules :nodoc:
+func (handler *RulesHandler) GetRules(writer http.ResponseWriter, request *http.Request) {
+	rules, err := handler.twitterService.GetRules()
+	if err != nil {
+		errResponse := newErrorResponse(http.StatusInternalServerError, err.Error())
+		render.Render(writer, request, errResponse)
+		return
+	}
+
+	if err = render.Render(writer, request, responses.NewRulesListResponse(rules)); err != nil {
+		errResponse := newErrorResponse(http.StatusInternalServerError, err.Error())
+		render.Render(writer, request, errResponse)
+		return
+	}
 }
 
 // StoreRules :nodoc:
