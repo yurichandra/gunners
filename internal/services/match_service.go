@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -12,13 +13,20 @@ import (
 
 // MatchService :nodoc
 type MatchService struct {
-	matchRepo repositories.MatchRepositoryContract
+	matchRepo      repositories.MatchRepositoryContract
+	twitterService TwitterServiceContract
 }
 
+var officialFPLaccount = "OfficialFPL"
+
 // NewMatchService :nodoc
-func NewMatchService(matchRepository repositories.MatchRepositoryContract) *MatchService {
+func NewMatchService(
+	matchRepository repositories.MatchRepositoryContract,
+	twitterService TwitterServiceContract,
+) *MatchService {
 	return &MatchService{
-		matchRepo: matchRepository,
+		matchRepo:      matchRepository,
+		twitterService: twitterService,
 	}
 }
 
@@ -42,5 +50,28 @@ func (service *MatchService) Store(ctx context.Context, data models.Match) (mode
 	data.Tag = matchKey
 	data.Score = []uint{0, 0}
 
+	err = service.storeRules(data)
+	if err != nil {
+		return models.Match{}, err
+	}
+
 	return service.matchRepo.Store(ctx, data)
+}
+
+func (service *MatchService) storeRules(data models.Match) error {
+	ruleValue := fmt.Sprintf(
+		"from:%s %s Goal",
+		officialFPLaccount,
+		data.Tag,
+	)
+
+	rules := make([]models.TwitterRules, 0)
+	rules = append(rules, models.TwitterRules{Value: ruleValue})
+
+	_, err := service.twitterService.SetRules(rules)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

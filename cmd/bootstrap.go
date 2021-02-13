@@ -48,7 +48,7 @@ func bootstrap() {
 	matchRepository = repositories.NewMatchRepository(db)
 
 	twitterService = services.NewTwitterService(httpClient)
-	matchService = services.NewMatchService(matchRepository)
+	matchService = services.NewMatchService(matchRepository, twitterService)
 
 	rulesHandler = handlers.NewRulesHandler(twitterService)
 	matchHandler = handlers.NewMatchHandler(matchService)
