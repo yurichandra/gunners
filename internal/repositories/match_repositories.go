@@ -43,3 +43,13 @@ func (repo *MatchRepository) Get(ctx context.Context) ([]models.Match, error) {
 
 	return matches, nil
 }
+
+// Store :nodoc
+func (repo *MatchRepository) Store(ctx context.Context, data models.Match) (models.Match, error) {
+	_, err := repo.db.Collection("matches").InsertOne(ctx, data)
+	if err != nil {
+		return models.Match{}, err
+	}
+
+	return data, nil
+}
