@@ -1,0 +1,102 @@
+{
+  "Arsenal": {
+    "name": "Arsenal",
+    "shortName": "Arsenal",
+    "abbreviation": "ARS"
+  },
+  "Aston Villa":  {
+    "name": "Aston Villa",
+    "shortName": "Aston Villa",
+    "abbreviation": "AVL"
+  },
+  "Brighton & Hove Albion": {
+    "name": "Brighton & Hove Albion",
+    "shortName": "Brighton",
+    "abbreviation": "BHA"
+  },
+  "Burnley": {
+    "name": "Burnley",
+    "shortName": "Burnley",
+    "abbreviation": "BUR"
+  },
+  "Chelsea": {
+    "name": "Chelsea",
+    "shortName": "Chelsea",
+    "abbreviation": "CHE"
+  },
+  "Crystal Palace": {
+    "name": "Crystal Palace",
+    "shortName": "Crystal Palace",
+    "abbreviation": "CRY"
+  },
+  "Everton": {
+    "name": "Everton",
+    "shortName": "Everton",
+    "abbreviation": "EVE"
+  },
+  "Fulham": {
+    "name": "Fulham",
+    "shortName": "Fulham",
+    "abbreviation": "FUL"
+  },
+  "Leeds United": {
+    "name": "Leeds United",
+    "shortName": "Leeds",
+    "abbreviation": "LEE"
+  },
+  "Leicester City": {
+    "name": "Leicester City",
+    "shortName": "Leicester",
+    "abbreviation": "LEI"
+  },
+  "Liverpool": {
+    "name": "Liverpool",
+    "shortName": "Liverpool",
+    "abbreviation": "LIV"
+  },
+  "Manchester City":  {
+    "name": "Manchester City",
+    "shortName": "Man City",
+    "abbreviation": "MCI"
+  },
+  "Manchester United":  {
+    "name": "Manchester United",
+    "shortName": "Man Utd",
+    "abbreviation": "MUN"
+  },
+  "Newcastle United":  {
+    "name": "Newcastle United",
+    "shortName": "Newcastle",
+    "abbreviation": "NEW"
+  },
+  "Tottenham Hotspur": {
+    "name": "Tottenham Hotspur",
+    "shortName": "Spurs",
+    "abbreviation": "TOT"
+  },
+  "Sheffield United": {
+    "name": "Sheffield United",
+    "shortName": "Sheff Utd",
+    "abbreviation": "SHU"
+  },
+  "Southampton": {
+    "name": "Southampton",
+    "shortName": "Southampton",
+    "abbreviation": "SOU"
+  },
+  "West Bromwich Albion": {
+    "name": "West Bromwich Albion",
+    "shortName": "West Brom",
+    "abbreviation": "WBA"
+  },
+  "West Ham": {
+    "name": "West Ham",
+    "shortName": "West Ham",
+    "abbreviation": "WHU"
+  },
+  "Wolverhampton Wanderers": {
+    "name": "Wolverhampton Wanderers",
+    "shortName": "Wolves",
+    "abbreviation": "WOL"
+  }
+}

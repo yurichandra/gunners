@@ -44,6 +44,39 @@ func (repo *MatchRepository) Get(ctx context.Context) ([]models.Match, error) {
 	return matches, nil
 }
 
+// FindByTag :nodoc
+func (repo *MatchRepository) FindByTag(ctx context.Context, tag string) (models.Match, error) {
+	cursor, err := repo.db.Collection("matches").Find(ctx, bson.M{"tag": tag})
+	if err != nil {
+		return models.Match{}, err
+	}
+
+	var record models.Match
+	for cursor.Next(ctx) {
+		cursor.Decode(&record)
+	}
+
+	return record, nil
+}
+
+// Update :nodoc
+func (repo *MatchRepository) Update(ctx context.Context, data models.Match) (models.Match, error) {
+	_, err := repo.
+		db.Collection("matches").UpdateOne(
+		ctx,
+		bson.M{"tag": data.Tag},
+		bson.D{
+			{"$set", bson.D{{"score", data.Score}}},
+		},
+	)
+	if err != nil {
+		return models.Match{}, err
+	}
+
+	newMatch, _ := repo.FindByTag(ctx, data.Tag)
+	return newMatch, nil
+}
+
 // Store :nodoc
 func (repo *MatchRepository) Store(ctx context.Context, data models.Match) (models.Match, error) {
 	_, err := repo.db.Collection("matches").InsertOne(ctx, data)

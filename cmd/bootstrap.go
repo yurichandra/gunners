@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -47,11 +48,14 @@ func bootstrap() {
 
 	matchRepository = repositories.NewMatchRepository(db)
 
-	twitterService = services.NewTwitterService(httpClient)
+	twitterService = services.NewTwitterService(httpClient, matchRepository)
 	matchService = services.NewMatchService(matchRepository, twitterService)
 
 	rulesHandler = handlers.NewRulesHandler(twitterService)
 	matchHandler = handlers.NewMatchHandler(matchService)
+
+	ctx := context.Background()
+	go twitterService.Stream(ctx)
 }
 
 func initHTTP() {

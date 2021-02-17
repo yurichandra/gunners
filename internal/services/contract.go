@@ -10,6 +10,7 @@ import (
 type TwitterServiceContract interface {
 	SetRules(rules []models.TwitterRules) (bool, error)
 	GetRules() ([]models.TwitterRules, error)
+	Stream(ctx context.Context)
 }
 
 // MatchServiceContract :nodoc
