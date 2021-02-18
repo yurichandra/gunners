@@ -125,11 +125,9 @@ func (service *TwitterService) Stream(ctx context.Context) {
 	req.Header.Add("Content-Type", "application/json")
 
 	newHTTP := &http.Client{}
-	request := 0
 
 	go func() {
 		response, err := newHTTP.Do(req)
-		request++
 		if err != nil {
 			log.Println(err.Error())
 			return
@@ -139,7 +137,6 @@ func (service *TwitterService) Stream(ctx context.Context) {
 			switch response.StatusCode {
 			case 200:
 				fmt.Println(response)
-
 				var stream StreamDataResponse
 
 				err = json.NewDecoder(response.Body).Decode(&stream)
@@ -160,7 +157,7 @@ func (service *TwitterService) Stream(ctx context.Context) {
 		}
 	}()
 
-	fmt.Println("[*] Listen tweet from Official FPL :D")
+	fmt.Println("[*] Listen live score tweet")
 }
 
 func (service *TwitterService) handleReadData(ctx context.Context, text string) {
@@ -169,15 +166,15 @@ func (service *TwitterService) handleReadData(ctx context.Context, text string) 
 
 	newText := strings.Replace(text, "#FPL", "", 1)
 
-	pattern, _ := regexp.Compile(scorePattern)
-	match := pattern.MatchString(newText)
+	matchPattern := regexp.MustCompile(scorePattern)
+	match := matchPattern.MatchString(newText)
 	fmt.Println(match)
 
-	scoreString := pattern.FindString(newText)
+	scoreString := matchPattern.FindString(newText)
 	scores := strings.Split(scoreString, "-")
 
-	newPattern := regexp.MustCompile(tagPattern)
-	matchTag := newPattern.FindString(newText)
+	newTagPattern := regexp.MustCompile(tagPattern)
+	matchTag := newTagPattern.FindString(newText)
 
 	ongoingMatch, _ := service.matchRepository.FindByTag(ctx, matchTag)
 	pastScores := ongoingMatch.Score
