@@ -3,7 +3,7 @@ package responses
 import (
 	"net/http"
 
-	"github.com/yurichandra/gunners/internal/models"
+	"github.com/yurichandra/gunners/internal/entities/models"
 )
 
 // MatchList :nodoc:

@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yurichandra/gunners/internal/models"
+	"github.com/yurichandra/gunners/internal/entities/models"
 	"github.com/yurichandra/gunners/internal/repositories"
 )
 

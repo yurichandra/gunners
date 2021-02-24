@@ -7,9 +7,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"github.com/yurichandra/gunners/internal/entities/models"
 	"github.com/yurichandra/gunners/internal/handlers/requests"
 	"github.com/yurichandra/gunners/internal/handlers/responses"
-	"github.com/yurichandra/gunners/internal/models"
 	"github.com/yurichandra/gunners/internal/services"
 )
 

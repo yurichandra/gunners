@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/yurichandra/gunners/internal/models"
+	"github.com/yurichandra/gunners/internal/entities/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

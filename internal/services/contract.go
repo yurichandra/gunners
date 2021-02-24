@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/yurichandra/gunners/internal/models"
+	"github.com/yurichandra/gunners/internal/entities/models"
 )
 
 // TwitterServiceContract :nodoc
