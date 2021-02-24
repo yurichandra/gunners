@@ -18,3 +18,8 @@ type MatchServiceContract interface {
 	Get(ctx context.Context) ([]models.Match, error)
 	Store(ctx context.Context, data models.Match) (models.Match, error)
 }
+
+// WebsocketServiceContract :nodoc
+type WebsocketServiceContract interface {
+	Serve(ctx context.Context)
+}

@@ -21,6 +21,7 @@ import (
 type TwitterService struct {
 	http            *http.Client
 	matchRepository repositories.MatchRepositoryContract
+	TwitterChan     chan []byte
 }
 
 type twitterResponse struct {
@@ -32,11 +33,20 @@ type twitterListResponse struct {
 	Data []twitterResponse `json:"data"`
 }
 
+// ScoreUpdate :nodoc
+type ScoreUpdate struct {
+	MatchTag string `json:"matchTag"`
+	Team     string `json:"team"`
+	Event    string `json:"event"`
+	Scores   []uint `json:"scores"`
+}
+
 // NewTwitterService :nodoc:
 func NewTwitterService(client *http.Client, matchRepository repositories.MatchRepositoryContract) *TwitterService {
 	return &TwitterService{
 		http:            client,
 		matchRepository: matchRepository,
+		TwitterChan:     make(chan []byte, 10),
 	}
 }
 
@@ -158,6 +168,8 @@ func (service *TwitterService) Stream(ctx context.Context) {
 	}()
 
 	fmt.Println("[*] Listen live score tweet")
+	forever := make(chan bool)
+	<-forever
 }
 
 func (service *TwitterService) handleReadData(ctx context.Context, text string) {
@@ -182,14 +194,25 @@ func (service *TwitterService) handleReadData(ctx context.Context, text string) 
 	newHomeScore, _ := strconv.Atoi(scores[0])
 	newAwayScore, _ := strconv.Atoi(scores[1])
 
+	event := ScoreUpdate{
+		Team:     ongoingMatch.HomeTeam,
+		Scores:   []uint{uint(newHomeScore), uint(newAwayScore)},
+		MatchTag: matchTag,
+	}
+
 	if newHomeScore > int(pastScores[0]) {
+		event.Event = "home_team_scored"
 		fmt.Printf("%s is scored\n", ongoingMatch.HomeTeam)
 	} else if newAwayScore > int(pastScores[1]) {
+		event.Event = "away_team_scored"
 		fmt.Printf("%s is scored\n", ongoingMatch.AwayTeam)
 	}
 
 	ongoingMatch.Score = []uint{uint(newHomeScore), uint(newAwayScore)}
 	service.matchRepository.Update(ctx, ongoingMatch)
+
+	parsedPayload, _ := json.Marshal(&event)
+	service.TwitterChan <- parsedPayload
 }
 
 func createRequestBody(rules []models.TwitterRules) []byte {

@@ -29,6 +29,7 @@ var matchService *services.MatchService
 
 var rulesHandler *handlers.RulesHandler
 var matchHandler *handlers.MatchHandler
+var websocketHandler *handlers.WebsocketHandler
 
 var httpClient http.Client
 
@@ -53,29 +54,48 @@ func bootstrap() {
 
 	rulesHandler = handlers.NewRulesHandler(twitterService)
 	matchHandler = handlers.NewMatchHandler(matchService)
+	websocketHandler = handlers.NewWebsocketHandler(twitterService)
 
 	ctx := context.Background()
+
+	// goroutine to handle listen stream.
 	go twitterService.Stream(ctx)
 }
 
 func initHTTP() {
-	router := chi.NewRouter()
+	httpRouter := chi.NewRouter()
+	wsRouter := chi.NewRouter()
 
-	router.Use(middleware.Logger)
-	router.Use(render.SetContentType(render.ContentTypeJSON))
-	router.Use(cors.Handler(cors.Options{
+	httpRouter.Use(middleware.Logger)
+	httpRouter.Use(render.SetContentType(render.ContentTypeJSON))
+	httpRouter.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"X-PINGOTHER", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 	}))
 
-	router.Mount("/matches", matchHandler.GetRoutes())
-	router.Mount("/rules", rulesHandler.GetRoutes())
+	httpRouter.Mount("/matches", matchHandler.GetRoutes())
+	httpRouter.Mount("/rules", rulesHandler.GetRoutes())
+
+	wsRouter.Use(middleware.Logger)
+	wsRouter.Use(render.SetContentType(render.ContentTypeJSON))
+	wsRouter.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8080"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET"},
+		AllowedHeaders:   []string{"X-PINGOTHER", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+	}))
+	wsRouter.Mount("/ws", websocketHandler.GetRoutes())
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
 		port = "8000"
 	}
 
-	fmt.Printf("Application is running on port :%s\n", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), router)
+	fmt.Printf("HTTP protocol is running on port :%s\n", port)
+	fmt.Printf("Websocket protocol is running on port 9000\n")
+
+	// goroutine for handle websocket connection.
+	go http.ListenAndServe(":9000", wsRouter)
+	http.ListenAndServe(fmt.Sprintf(":%s", port), httpRouter)
 }
