@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/yurichandra/gunners/internal/entities/dto"
 	"github.com/yurichandra/gunners/internal/entities/models"
 	"github.com/yurichandra/gunners/internal/repositories"
 )
@@ -22,23 +23,6 @@ type TwitterService struct {
 	http            *http.Client
 	matchRepository repositories.MatchRepositoryContract
 	TwitterChan     chan []byte
-}
-
-type twitterResponse struct {
-	ID    string `json:"id"`
-	Value string `json:"value"`
-}
-
-type twitterListResponse struct {
-	Data []twitterResponse `json:"data"`
-}
-
-// ScoreUpdate :nodoc
-type ScoreUpdate struct {
-	MatchTag string `json:"matchTag"`
-	Team     string `json:"team"`
-	Event    string `json:"event"`
-	Scores   []uint `json:"scores"`
 }
 
 // NewTwitterService :nodoc:
@@ -67,7 +51,7 @@ func (service *TwitterService) GetRules() ([]models.TwitterRules, error) {
 		return []models.TwitterRules{}, err
 	}
 
-	var rules twitterListResponse
+	var rules dto.TweetListDTO
 
 	err = json.Unmarshal(body, &rules)
 	if err != nil {
@@ -110,17 +94,6 @@ func (service *TwitterService) SetRules(rules []models.TwitterRules) (bool, erro
 	return true, nil
 }
 
-// DetailStreamDataResponse :nodoc
-type DetailStreamDataResponse struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-}
-
-// StreamDataResponse :nodoc
-type StreamDataResponse struct {
-	Data DetailStreamDataResponse `json:"data"`
-}
-
 // Stream :nodoc
 func (service *TwitterService) Stream(ctx context.Context) {
 	url := fmt.Sprintf("%s/2/tweets/search/stream", os.Getenv("TWITTER_API_BASE"))
@@ -147,7 +120,7 @@ func (service *TwitterService) Stream(ctx context.Context) {
 			switch response.StatusCode {
 			case 200:
 				fmt.Println(response)
-				var stream StreamDataResponse
+				var stream dto.StreamDTO
 
 				err = json.NewDecoder(response.Body).Decode(&stream)
 				if err != nil {
@@ -194,7 +167,7 @@ func (service *TwitterService) handleReadData(ctx context.Context, text string) 
 	newHomeScore, _ := strconv.Atoi(scores[0])
 	newAwayScore, _ := strconv.Atoi(scores[1])
 
-	event := ScoreUpdate{
+	event := dto.EventDTO{
 		Team:     ongoingMatch.HomeTeam,
 		Scores:   []uint{uint(newHomeScore), uint(newAwayScore)},
 		MatchTag: matchTag,
