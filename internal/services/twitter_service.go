@@ -16,6 +16,7 @@ import (
 	"github.com/yurichandra/gunners/internal/entities/dto"
 	"github.com/yurichandra/gunners/internal/entities/models"
 	"github.com/yurichandra/gunners/internal/repositories"
+	"github.com/yurichandra/gunners/internal/utils"
 )
 
 // TwitterService :nodoc:
@@ -109,6 +110,9 @@ func (service *TwitterService) Stream(ctx context.Context) {
 
 	newHTTP := &http.Client{}
 
+	// backoff to support ExponentialBackoff in case call to twitter stream API reach limit (50 call/15 minutes)
+	b := utils.NewBackoffUtil()
+
 	go func() {
 		response, err := newHTTP.Do(req)
 		if err != nil {
@@ -127,10 +131,15 @@ func (service *TwitterService) Stream(ctx context.Context) {
 					fmt.Println(err.Error())
 				}
 
+				// Reset backoff if success
+				b.Reset()
+
 				if stream.Data.Text != "" {
 					service.handleReadData(ctx, stream.Data.Text)
 				}
 			case 429:
+				// Set next interval backoff in case hit Rate limit.
+				b.NextBackOff()
 				fmt.Println(response)
 				fmt.Println("You opened too many connections...")
 			default:
