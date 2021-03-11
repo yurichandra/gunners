@@ -2,6 +2,23 @@
 
 A livescore API utilize Twitter stream API.
 
+## How to use
+
+- Setup mongoDB in your local.
+- Add your Twitter API token on env.
+- Run server by type command `refresh run main.go`.
+- Store match that you want to keep livescore up to date by hit `POST /matches` endpoint with example payload below.
+
+```JSON
+    {
+        "homeTeam": "Liverpool",
+        "awayTeam": "Everton",
+        "date": "2021-02-21"
+    }
+```
+
+- Just wait, if a team that you watch is score, it will print `Liverpool is scored` in the console.
+
 ## Main Services
 
 ### `TwitterService`
@@ -17,9 +34,5 @@ WebsocketService will responsible to be layer that sending data into websocket c
 ### API Design
 
 ![Screenshot](livescore-api.png)
-
-## TODO
-
-- Adding backoff implementation if Twitter API hit rate limit.
 
 In case you guys have any feedbacks, please don't hesitate to raise issues. Thank you.
